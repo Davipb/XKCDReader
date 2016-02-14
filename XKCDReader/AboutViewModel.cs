@@ -26,10 +26,18 @@ namespace XKCDReader
 		Random rng = new Random();
 
 		public RelayCommand CatCommand { get; }
+		public RelayCommand CopyLinkCommand { get; }
+		public RelayCommand OpenLinkCommand { get; }
 
 		public AboutViewModel()
 		{
 			CatCommand = new RelayCommand(Cat);
+
+			CopyLinkCommand = new RelayCommand(
+				(o) => Clipboard.SetText(o as string));
+
+			OpenLinkCommand = new RelayCommand(
+				(o) => System.Diagnostics.Process.Start(o as string));
 		}
 
 		/// <summary>

@@ -20,15 +20,15 @@
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
 
-        <Style x:Key="ClearButton" TargetType="Button">
+        <Style x:Key="ClearButton" TargetType="{x:Type Button}">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0" />
-        </Style>     
+        </Style>       
         
     </Window.Resources>
 
     <Window.InputBindings>
-        <KeyBinding Modifiers="Ctrl" Key="C" Command="{Binding CopyLinkCommand}" />
+        <KeyBinding Modifiers="Ctrl" Key="C" Command="{Binding CopyLinkCommand}" CommandParameter="http://www.xkcd.com/{0}/"/>
         <KeyBinding Modifiers="Ctrl" Key="Delete" Command="{Binding ClearComicsCommand}" />
         <KeyBinding Key="Delete" Command="{Binding RemoveComicCommand}" />
         <KeyBinding Key="Insert" Command="{Binding AddComicCommand}" />
@@ -73,7 +73,7 @@
 
             <ListBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Copy link" Command="{Binding CopyLinkCommand}" InputGestureText="Ctrl+C">
+                    <MenuItem Header="Copy link" Command="{Binding CopyLinkCommand}" CommandParameter="http://www.xkcd.com/{0}/" InputGestureText="Ctrl+C">
                         <MenuItem.Icon>
                             <Viewbox>
                                 <Canvas Width="24" Height="24">
@@ -280,17 +280,20 @@
 
                     <Separator Grid.Row="5" Grid.ColumnSpan="99" Margin="5" />
 
-                    <TextBlock Grid.Row="6" Grid.ColumnSpan="99" VerticalAlignment="Center" HorizontalAlignment="Center" Typography.Capitals="SmallCaps"
-                               Margin="5">                        
-                        <Hyperlink NavigateUri="dummy">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="RequestNavigate">
-                                    <i:InvokeCommandAction Command="{Binding OpenExplainSiteCommand}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                            Explain
-                        </Hyperlink>
-                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.ColumnSpan="99"
+                                VerticalAlignment="Center" HorizontalAlignment="Center"
+                                Margin="5">
+
+                        <Button Style="{StaticResource HyperlinkButton}" CommandParameter="http://www.explainxkcd.com/{0}/">
+                            <TextBlock Typography.Capitals="SmallCaps">Explain</TextBlock>
+                        </Button>
+
+                        <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="10,0"/>
+
+                        <Button Style="{StaticResource HyperlinkButton}" CommandParameter="http://www.xkcd.com/{0}/">
+                            <TextBlock Typography.Capitals="SmallCaps">Original</TextBlock>
+                        </Button>
+                    </StackPanel>
 
                 </Grid>
 

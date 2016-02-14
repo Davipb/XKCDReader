@@ -5,5 +5,35 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <BitmapImage x:Key="DefaultImage" UriSource="Default.png" />
+
+        <Style x:Key="HyperlinkButton" TargetType="{x:Type Button}">
+            <Setter Property="Foreground" Value="Blue" />
+            <Setter Property="Command" Value="{Binding OpenLinkCommand}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#FF4C4CFF" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="DarkGray" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                        <ContentPresenter DataContext="{TemplateBinding DataContext}">
+                            <ContentPresenter.ContextMenu>
+                                <ContextMenu DataContext="{TemplateBinding DataContext}">
+                                    <MenuItem DataContext="{TemplateBinding DataContext}"
+                                              Header="Copy link" Command="{Binding CopyLinkCommand}"
+                                              CommandParameter="{TemplateBinding CommandParameter}"/>
+                                </ContextMenu>
+                            </ContentPresenter.ContextMenu>
+                        </ContentPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Application.Resources>
 </Application>

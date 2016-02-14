@@ -12,8 +12,6 @@ namespace XKCDReader
 {
 	public class MainWindowViewModel : INotifyPropertyChanged
 	{
-		const string ComicLinkTemplate = @"http://xkcd.com/{0}/";
-		const string ExplainLinkTemplate = @"http://explainxkcd.com/{0}/";
 		const string ConfigurationFile = "config";
 
 		public ObservableCollection<XKCDComic> Comics { get; } = new ObservableCollection<XKCDComic>();
@@ -46,7 +44,7 @@ namespace XKCDReader
 
 		public RelayCommand CopyLinkCommand { get; }
 		public RelayCommand DeleteCacheCommand { get; }
-		public RelayCommand OpenExplainSiteCommand { get; }
+		public RelayCommand OpenLinkCommand { get; }
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -67,16 +65,16 @@ namespace XKCDReader
 			ConfigurationCommand = new RelayCommand(Configuration);
 
 			CopyLinkCommand = new RelayCommand(
-				() => Clipboard.SetText(string.Format(ComicLinkTemplate, SelectedComic?.Number)),
-				() => SelectedComic != null);
+				(o) => Clipboard.SetText(string.Format(o as string, SelectedComic.Number)),
+				(o) => SelectedComic != null && o is string);
 
 			DeleteCacheCommand = new RelayCommand(
 				() => SelectedComic?.DeleteCache(),
 				() => SelectedComic != null);
 
-			OpenExplainSiteCommand = new RelayCommand(
-				() => System.Diagnostics.Process.Start(string.Format(ExplainLinkTemplate, SelectedComic.Number)),
-				() => SelectedComic != null);
+			OpenLinkCommand = new RelayCommand(
+				(o) => System.Diagnostics.Process.Start(string.Format(o as string, SelectedComic.Number)),
+				(o) => SelectedComic != null && o is string);
 
 			PropertyChanged += (o, e) =>
 			{
@@ -84,7 +82,8 @@ namespace XKCDReader
 				{
 					RemoveComicCommand.RaiseCanExecuteChanged();
 					DeleteCacheCommand.RaiseCanExecuteChanged();
-					OpenExplainSiteCommand.RaiseCanExecuteChanged();
+					OpenLinkCommand.RaiseCanExecuteChanged();
+					CopyLinkCommand.RaiseCanExecuteChanged();
 				}
 
 				if (e.PropertyName == "Downloading")
