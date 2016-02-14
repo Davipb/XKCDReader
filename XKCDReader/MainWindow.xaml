@@ -1,0 +1,324 @@
+﻿<Window x:Class="XKCDReader.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XKCDReader"
+        mc:Ignorable="d"
+        Title="XKCD Reader" Icon="Icon.png"
+        MinHeight="500" MinWidth="700"
+        Height="500" Width="700"
+        FontFamily="./Fonts/#Linux Libertine O" FontSize="18"
+        x:Name="ThisWindow">
+
+    <Window.Resources>
+        <CollectionViewSource x:Key="ComicsView" Source="{Binding Comics}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Number" Direction="Descending" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+
+        <Style x:Key="ClearButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>     
+        
+    </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="C" Command="{Binding CopyLinkCommand}" />
+        <KeyBinding Modifiers="Ctrl" Key="Delete" Command="{Binding ClearComicsCommand}" />
+        <KeyBinding Key="Delete" Command="{Binding RemoveComicCommand}" />
+        <KeyBinding Key="Insert" Command="{Binding AddComicCommand}" />
+        <KeyBinding Key="Q" Command="{Binding AddRandomComicCommand}" CommandParameter="0" />
+        <KeyBinding Modifiers="Shift" Key="Q" Command="{Binding AddRandomComicCommand}" CommandParameter="1"/>
+        <KeyBinding Modifiers="Ctrl" Key="Q" Command="{Binding AddRandomComicCommand}" CommandParameter="2"/>
+        <KeyBinding Key="W" Command="{Binding AddCurrentComicCommand}" />
+    </Window.InputBindings>
+    
+    <Window.DataContext>
+        <local:MainWindowViewModel />
+    </Window.DataContext>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Closed">
+            <i:InvokeCommandAction Command="{Binding ClosedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ListBox x:Name="MainListBox" Grid.Column="0" BorderThickness="0"
+                 ItemsSource="{Binding Source={StaticResource ComicsView}}" SelectedValue="{Binding SelectedComic}">
+            
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Number, FallbackValue=????}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy link" Command="{Binding CopyLinkCommand}" InputGestureText="Ctrl+C">
+                        <MenuItem.Icon>
+                            <Viewbox>
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M10.59,13.41C11,13.8 11,14.44 10.59,14.83C10.2,15.22 9.56,15.22 9.17,14.83C7.22,12.88 7.22,9.71 9.17,7.76V7.76L12.71,4.22C14.66,2.27 17.83,2.27 19.78,4.22C21.73,6.17 21.73,9.34 19.78,11.29L18.29,12.78C18.3,11.96 18.17,11.14 17.89,10.36L18.36,9.88C19.54,8.71 19.54,6.81 18.36,5.64C17.19,4.46 15.29,4.46 14.12,5.64L10.59,9.17C9.41,10.34 9.41,12.24 10.59,13.41M13.41,9.17C13.8,8.78 14.44,8.78 14.83,9.17C16.78,11.12 16.78,14.29 14.83,16.24V16.24L11.29,19.78C9.34,21.73 6.17,21.73 4.22,19.78C2.27,17.83 2.27,14.66 4.22,12.71L5.71,11.22C5.7,12.04 5.83,12.86 6.11,13.65L5.64,14.12C4.46,15.29 4.46,17.19 5.64,18.36C6.81,19.54 8.71,19.54 9.88,18.36L13.41,14.83C14.59,13.66 14.59,11.76 13.41,10.59C13,10.2 13,9.56 13.41,9.17Z" Fill="Black" />
+                                </Canvas>
+                            </Viewbox>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Clear comic's cache" Command="{Binding DeleteCacheCommand}">
+                        <MenuItem.Icon>
+                            <Viewbox>
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19Z" Fill="Black" />
+                                </Canvas>
+                            </Viewbox>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="Clear List" Command="{Binding ClearComicsCommand}" InputGestureText="Ctrl+Del">
+                        <MenuItem.Icon>
+                            <Viewbox>
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M5,13H19V11H5M3,17H17V15H3M7,7V9H21V7" Fill="Black" />
+                                </Canvas>
+                            </Viewbox>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+            
+        </ListBox>
+
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="32"/>
+            </Grid.RowDefinitions>
+
+            <Button Grid.Column="0" ToolTip="Add Comic (Insert)" Style="{StaticResource ClearButton}"
+                    Command="{Binding AddComicCommand}" CommandParameter="{Binding ElementName=ThisWindow}">
+                <Viewbox>
+                    <Canvas Width="24" Height="24">
+                        <Path Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" Fill="DarkGreen" />
+                    </Canvas>
+                </Viewbox>
+            </Button>
+
+            <Button Grid.Column="1" ToolTip="Remove Comic (Del)"
+                    Command="{Binding RemoveComicCommand}">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource ClearButton}">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="Foreground" Value="DarkRed" />
+                            </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="Gray" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <Viewbox>
+                    <Canvas Width="24" Height="24">
+                        <Path Data="M19,13H5V11H19V13Z"
+                              Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}"/>
+                    </Canvas>
+                </Viewbox>
+            </Button>
+
+            <Button Grid.Row="1" Grid.Column="0" ToolTip="Add Current Comic (W)" 
+                    Style="{StaticResource ClearButton}"
+                    Command="{Binding AddCurrentComicCommand}">
+                <Viewbox>
+                    <Canvas Width="24" Height="24">
+                        <Path Data="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z" Fill="Black" />
+                    </Canvas>
+                </Viewbox>
+            </Button>
+
+            <Button Grid.Row="1" Grid.Column="1"
+                    Style="{StaticResource ClearButton}">
+                <Button.ToolTip>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition  Width="5"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock HorizontalAlignment="Right" FontWeight="Bold">
+                            Click / Q:
+                        </TextBlock>
+                        <TextBlock Grid.Column="2">
+                            Random comic
+                        </TextBlock>
+
+                        <TextBlock HorizontalAlignment="Right" Grid.Row="1" FontWeight="Bold">
+                            Shift+Click / Shift+Q:
+                        </TextBlock>
+                        <TextBlock Grid.Row="1" Grid.Column="2">
+                            New (Non-listed) Random comic
+                        </TextBlock>
+
+                        <TextBlock HorizontalAlignment="Right" Grid.Row="2" FontWeight="Bold">
+                            Ctrl+Click / Ctrl+Q:
+                        </TextBlock>
+                        <TextBlock Grid.Row="2" Grid.Column="2">
+                            Old (Already-listed) Random comic
+                        </TextBlock>
+
+                    </Grid>                    
+                </Button.ToolTip>
+                <Button.InputBindings>
+                    <MouseBinding Gesture="LeftClick" Command="{Binding AddRandomComicCommand}" CommandParameter="0" />
+                    <MouseBinding Gesture="Shift+LeftClick" Command="{Binding AddRandomComicCommand}" CommandParameter="1" />
+                    <MouseBinding Gesture="Ctrl+LeftClick" Command="{Binding AddRandomComicCommand}" CommandParameter="2" />
+                </Button.InputBindings>
+                <Viewbox >
+                    <Canvas Width="24" Height="24">
+                        <Path Data="M5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3M7,5A2,2 0 0,0 5,7A2,2 0 0,0 7,9A2,2 0 0,0 9,7A2,2 0 0,0 7,5M17,15A2,2 0 0,0 15,17A2,2 0 0,0 17,19A2,2 0 0,0 19,17A2,2 0 0,0 17,15M17,5A2,2 0 0,0 15,7A2,2 0 0,0 17,9A2,2 0 0,0 19,7A2,2 0 0,0 17,5M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10M7,15A2,2 0 0,0 5,17A2,2 0 0,0 7,19A2,2 0 0,0 9,17A2,2 0 0,0 7,15Z" Fill="Black" />
+                    </Canvas>
+                </Viewbox>
+            </Button>
+        </Grid>
+
+        <Separator Grid.Column="1" Grid.RowSpan="99" Margin="5"
+                   Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+
+        <ScrollViewer Grid.Column="2" Grid.RowSpan="99" VerticalScrollBarVisibility="Auto"
+                      CanContentScroll="True">
+            
+            <Grid>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.ColumnSpan="99"
+                           FontSize="21px" Typography.Capitals="SmallCaps"
+                           TextWrapping="Wrap" TextAlignment="Center"
+                           HorizontalAlignment="Center" Margin="10"
+                           Text="{Binding SelectedComic.Title, FallbackValue=?, TargetNullValue=?}"/>
+
+                <!-- Width/Height are bound instead of set to automatic because of automatic DPI scaling-->
+                <!-- Without this, almost all images would be too big -->
+                <!-- With this, plus Stretching and BitmapScaling, the image is always pixel-perfect-->
+                <Image Grid.Row="1"
+                       HorizontalAlignment="Center" Source="{Binding SelectedComic.Image, FallbackValue={StaticResource DefaultImage}}"
+                       ToolTip="{Binding SelectedComic.HoverText}"
+                       RenderOptions.BitmapScalingMode="NearestNeighbor" SnapsToDevicePixels="True"
+                       Stretch="Uniform"
+                       Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
+                       Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"/>
+
+                <Grid Grid.Row="2" Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Typography.Capitals="SmallCaps" FontWeight="Bold">Hover Text:</TextBlock>
+                    <TextBlock Margin="10" TextWrapping="Wrap" Grid.Column="1" VerticalAlignment="Center"
+                               Text="{Binding SelectedComic.HoverText, FallbackValue=[None], TargetNullValue=[None]}"/>
+
+                    <Separator Grid.Row="1" Grid.ColumnSpan="99" Margin="5" />
+
+                    <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Typography.Capitals="SmallCaps" FontWeight="Bold">Transcript:</TextBlock>
+                    <TextBlock Grid.Row="2" Margin="10" TextWrapping="Wrap" Grid.Column="1" VerticalAlignment="Center"
+                               Text="{Binding SelectedComic.Transcript, FallbackValue=[None], TargetNullValue=[None]}"/>
+
+                    <Separator Grid.Row="3" Grid.ColumnSpan="99" Margin="5" />
+
+                    <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Center" Typography.Capitals="SmallCaps" FontWeight="Bold">Date:</TextBlock>
+                    <TextBlock Grid.Row="4" Margin="10" TextWrapping="Wrap" Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="Year: {0} Month: {1} Day: {2}">
+                                <Binding Path="SelectedComic.Year" FallbackValue="????" TargetNullValue="????"/>
+                                <Binding Path="SelectedComic.Month" FallbackValue="??" TargetNullValue="??" />
+                                <Binding Path="SelectedComic.Day" FallbackValue="??" TargetNullValue="??" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+
+                    <Separator Grid.Row="5" Grid.ColumnSpan="99" Margin="5" />
+
+                    <TextBlock Grid.Row="6" Grid.ColumnSpan="99" VerticalAlignment="Center" HorizontalAlignment="Center" Typography.Capitals="SmallCaps"
+                               Margin="5">                        
+                        <Hyperlink NavigateUri="dummy">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="RequestNavigate">
+                                    <i:InvokeCommandAction Command="{Binding OpenExplainSiteCommand}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            Explain
+                        </Hyperlink>
+                    </TextBlock>
+
+                </Grid>
+
+                <StackPanel Grid.Column="99" Grid.Row="99" Orientation="Horizontal"
+                            VerticalAlignment="Bottom" HorizontalAlignment="Right">
+
+                    <Button Background="Transparent" Margin="5" 
+                            Command="{Binding ConfigurationCommand}" CommandParameter="{Binding ElementName=ThisWindow}"
+                            BorderThickness="0">
+                        <Viewbox >
+                            <Canvas Width="24" Height="24">
+                                <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
+                                      Fill="DarkGray" />
+                            </Canvas>
+                        </Viewbox>
+                    </Button>
+                    
+                    <Separator Margin="5" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+
+                    <Button Height="25" Margin="5" BorderThickness="0" Foreground="Gray" Background="Transparent"
+                            Command="{Binding AboutCommand}" CommandParameter="{Binding ElementName=ThisWindow}">
+                        About
+                    </Button>
+                </StackPanel>
+
+            </Grid>
+            
+        </ScrollViewer>        
+
+    </Grid>
+</Window>

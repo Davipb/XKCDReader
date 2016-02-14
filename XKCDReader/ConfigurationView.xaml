@@ -1,0 +1,71 @@
+﻿<Window x:Class="XKCDReader.ConfigurationView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XKCDReader"
+        mc:Ignorable="d"
+        Title="Configuration" Height="210" Width="400" Icon="Icon.png"
+        WindowStartupLocation="CenterOwner"
+        FontFamily="Fonts/#Linux Libertine O" FontSize="18"
+        x:Name="ConfigurationWindow" ResizeMode="NoResize" ShowInTaskbar="False">
+
+    <Window.DataContext>
+        <local:ConfigurationViewModel />
+    </Window.DataContext>
+
+    <Window.Resources>
+        <Style TargetType="CheckBox">
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Margin" Value="5" />
+        </Style>
+    </Window.Resources>
+    
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <CheckBox IsChecked="{Binding LoadCurrent}">
+            Automatically load current comic on startup
+        </CheckBox>
+
+        <CheckBox Grid.Row="1" IsChecked="{Binding SaveCache}"
+                  ToolTip="If disabled, the cache will be purged when the program closes.
+                  Saves storage space, but uses more bandwidth, since all comics will have to re-downloaded.">
+            Save Cache between sessions
+        </CheckBox>
+
+        <CheckBox Grid.Row="2" IsChecked="{Binding PurgeComic}"
+                  ToolTip="If enabled, only comics loaded in the current list will be cached. 
+                  Saves storage space, but uses more bandwidth, since new comics will always have to be downloaded from xkcd.">
+            Delete Cache with Comic
+        </CheckBox>
+
+        <Button Grid.Row="3" Command="{Binding ClearCacheCommand}"
+                HorizontalAlignment="Left" Margin="5">
+            Clear Cache
+        </Button>
+
+        <Button Grid.Row="99" Height="30" Width="60"
+            HorizontalAlignment="Left" VerticalAlignment="Bottom" Command="{Binding ResetCommand}">
+            Reset
+        </Button>
+
+        <StackPanel Grid.Row="99" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <Button Height="30" Width="60" Margin="0,0,10,0" 
+                    Command="{Binding CancelCommand}" CommandParameter="{Binding ElementName=ConfigurationWindow}">
+                Cancel
+            </Button>
+            <Button Height="30" Width="60" 
+                    Command="{Binding OkCommand}"  CommandParameter="{Binding ElementName=ConfigurationWindow}">
+                OK
+            </Button>
+        </StackPanel>
+
+    </Grid>
+</Window>
