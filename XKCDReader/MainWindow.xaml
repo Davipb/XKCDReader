@@ -11,7 +11,7 @@
         MinHeight="500" MinWidth="700"
         Height="500" Width="700"
         FontFamily="./Fonts/#Linux Libertine O" FontSize="18"
-        x:Name="ThisWindow">
+        x:Name="ThisWindow" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <CollectionViewSource x:Key="ComicsView" Source="{Binding Comics}">

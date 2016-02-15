@@ -27,7 +27,11 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Image Source="xkcdReader.png" />
+        <Image Source="xkcdReader.png" ToolTipService.InitialShowDelay="2000">
+            <Image.ToolTip>
+                <Image Source="EasterEggs/morePower.png" />
+            </Image.ToolTip>
+        </Image>
 
         <Grid VerticalAlignment="Stretch" HorizontalAlignment="Center" Grid.Row="1"
               Margin="0,50">
@@ -45,12 +49,18 @@
             <TextBlock Grid.Row="3" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Bottom">Made by Davipb</TextBlock>
             <Button Grid.Row="4" FontSize="25" HorizontalAlignment="Center" VerticalAlignment="Top"
                     Style="{StaticResource HyperlinkButton}"
-                    CommandParameter="https://github.com/Davipb/XKCDReader/">github.com/Davipb/XKCDReader
+                    CommandParameter="https://github.com/Davipb/XKCDReader/"
+                    ToolTipService.InitialShowDelay="2000">
+                <Button.ToolTip>
+                    <Image Source="EasterEggs/sun.png" />
+                </Button.ToolTip>
+                github.com/Davipb/XKCDReader
             </Button>
         </Grid>
 
         <Button Grid.Row="99" Width="24" Height="24" Margin="5"
-                Command="{Binding CatCommand}" Cursor="Hand">
+                Command="{Binding CatCommand}" Cursor="Hand"
+                ToolTipService.InitialShowDelay="2000">
 
             <Button.Template>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -74,6 +84,10 @@
                     <MenuItem Header="Meow" Command="{Binding CatCommand}" />
                 </ContextMenu>
             </Button.ContextMenu>
+
+            <Button.ToolTip>
+                <Image Source="EasterEggs/planet.png" />
+            </Button.ToolTip>
             
             <Viewbox>
                 <Canvas Width="24" Height="24">
@@ -83,7 +97,12 @@
             </Viewbox>
         </Button>
 
-        <Image Source="{Binding RandomCat}" Grid.RowSpan="2" Stretch="UniformToFill" Visibility="{Binding CatVisibility}"/>
+        <Image Source="{Binding RandomCat}" Grid.RowSpan="2" Stretch="UniformToFill" Visibility="{Binding CatVisibility}"
+               ToolTipService.InitialShowDelay="2000">
+            <Image.ToolTip>
+                <Image Source="EasterEggs/spiders.png" />
+            </Image.ToolTip>
+        </Image>
 
     </Grid>
     
