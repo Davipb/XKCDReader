@@ -23,8 +23,8 @@
         <Style x:Key="ClearButton" TargetType="{x:Type Button}">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0" />
-        </Style>       
-        
+        </Style>
+
     </Window.Resources>
 
     <Window.InputBindings>
@@ -37,10 +37,6 @@
         <KeyBinding Modifiers="Ctrl" Key="Q" Command="{Binding AddRandomComicCommand}" CommandParameter="2"/>
         <KeyBinding Key="W" Command="{Binding AddCurrentComicCommand}" />
     </Window.InputBindings>
-    
-    <Window.DataContext>
-        <local:MainWindowViewModel />
-    </Window.DataContext>
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">

@@ -6,7 +6,6 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace XKCDReader
@@ -135,7 +134,7 @@ namespace XKCDReader
 				}
 				catch (Exception e) when (e is JsonException || e is IOException)
 				{
-					MessageBox.Show($"Cache for comic number {number} is corrupt, will re-download from source", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+					// Cache corrupt, redownload
 					File.Delete(localCache);
 					download = true;
 				}
@@ -154,10 +153,8 @@ namespace XKCDReader
 				}
 				catch (Exception e) when (e is IOException || e is WebException || e is JsonException)
 				{
-					MessageBox.Show($"Unable to download comic {number}:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 					File.Delete(localCache);
-
-					return null;
+					throw;
 				}
 			}
 

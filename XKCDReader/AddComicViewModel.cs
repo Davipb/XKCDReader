@@ -10,6 +10,9 @@ namespace XKCDReader
 {
 	public class AddComicViewModel : INotifyPropertyChanged
 	{
+		public IMessageService Message { get; }
+		public IComicService ComicManager { get; }
+
 		int comicNumber;
 		public int ComicNumber
 		{
@@ -37,8 +40,11 @@ namespace XKCDReader
 		public event PropertyChangedEventHandler PropertyChanged;
 
 
-		public AddComicViewModel()
+		public AddComicViewModel(IMessageService message, IComicService comicManager)
 		{
+			Message = message;
+			ComicManager = comicManager;
+
 			DownloadCommand = new AsyncRelayCommand(Download, (o) => !Downloading && ComicValid(ComicNumber));
 
 			PropertyChanged += (o, e) =>
@@ -73,12 +79,12 @@ namespace XKCDReader
 
 			try
 			{
-				Result = await XKCDComic.FromComicNumber(comicNumber);
+				Result = await ComicManager.GetWithNumber(comicNumber);
 				window.DialogResult = true;
 			}
 			catch (Exception e) when (e is WebException || e is Newtonsoft.Json.JsonException)
 			{
-				MessageBox.Show($"Error downloading comic info:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				Message.Show($"Error downloading comic info:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 				window.DialogResult = false;
 			}
 

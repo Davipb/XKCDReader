@@ -15,6 +15,8 @@ namespace XKCDReader
 		const string ConfigurationFile = "config";
 
 		public ObservableCollection<XKCDComic> Comics { get; } = new ObservableCollection<XKCDComic>();
+		public IMessageService Message { get; }
+		public IComicService ComicManager { get; }
 
 		XKCDComic selectedComic = null;
 		public XKCDComic SelectedComic
@@ -50,8 +52,11 @@ namespace XKCDReader
 
 		int currentComicNumber = 0;
 
-		public MainWindowViewModel()
+		public MainWindowViewModel(IMessageService message, IComicService comicManager)
 		{
+			Message = message;
+			ComicManager = comicManager;
+
 			AddComicCommand = new RelayCommand(AddComic, (o) => !Downloading);
 			AddRandomComicCommand = new AsyncRelayCommand(AddRandomComic);
 			AddCurrentComicCommand = new AsyncRelayCommand(AddCurrentComic, (o) => !Downloading);
@@ -110,7 +115,7 @@ namespace XKCDReader
 		/// <param name="param">Command parameter, expected to be the current Window</param>
 		void AddComic(object param)
 		{
-			var context = new AddComicViewModel
+			var context = new AddComicViewModel(Message, ComicManager)
 			{
 				ComicNumber = SelectedComic?.Number ?? 1,
 				ComicValid = (i) => i > 0 && !Comics.Any(x => x.Number == i)
@@ -132,7 +137,7 @@ namespace XKCDReader
 		/// Adds a random comic to the list. See Remarks for more info
 		/// </summary>
 		/// <param name="param">Command parameter, expected to be a string which can be turned into an int. See Remarks for more info.</param>
-		/// <returns>A Task represeting the ongoing operation</returns>
+		/// <returns>A Task representing the ongoing operation</returns>
 		/// <remarks>
 		/// The <paramref name="param"/> parameter defines what type of random comic will be chosen:
 		/// <list type="bullet">
@@ -201,7 +206,7 @@ namespace XKCDReader
 			var comic = Comics.FirstOrDefault(x => x.Number == random);
 			if (comic == null)
 			{
-				comic = await XKCDComic.FromComicNumber(random);
+				comic = await ComicManager.GetWithNumber(random);
 				Comics.Add(comic);
 			}
 
@@ -222,11 +227,11 @@ namespace XKCDReader
 
 			var previous = Mouse.OverrideCursor;
 			Mouse.OverrideCursor = Cursors.Wait;
-			var current = await XKCDComic.FromComicNumber(currentComicNumber);
+			var current = await ComicManager.GetWithNumber(currentComicNumber);
 
 			if (Comics.Contains(current))
 			{
-				MessageBox.Show($"Current comic (number {current.Number}) already loaded", "Already loaded", MessageBoxButton.OK, MessageBoxImage.Information);
+				Message.Show($"Current comic (number {current.Number}) already loaded", "Already loaded", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
 			else
 			{
@@ -261,7 +266,7 @@ namespace XKCDReader
 		{
 			try
 			{
-				var currentComic = await XKCDComic.FromCurrent();
+				var currentComic = await ComicManager.GetCurrent();
 				currentComicNumber = currentComic.Number;
 
 				if (Properties.Settings.Default.LoadCurrent)
@@ -269,7 +274,7 @@ namespace XKCDReader
 			}
 			catch (Exception e) when (e is System.Net.WebException || e is IOException)
 			{
-				MessageBox.Show($"Unable to load current comic:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				Message.Show($"Unable to load current comic:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 
 			if (File.Exists(ConfigurationFile))
@@ -280,13 +285,13 @@ namespace XKCDReader
 				{
 					try
 					{
-						var loaded = await XKCDComic.FromComicNumber(comic);
+						var loaded = await ComicManager.GetWithNumber(comic);
 						if (loaded != null && !Comics.Contains(loaded))
 							Comics.Add(loaded);
 					}
 					catch (Exception e) when (e is IOException || e is System.Net.WebException)
 					{
-						MessageBox.Show($"Unable to load comic number {comic}:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+						Message.Show($"Unable to load comic number {comic}:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 					}
 				}
 
@@ -310,13 +315,20 @@ namespace XKCDReader
 						await writer.WriteLineAsync(comic.Number.ToString());
 					}
 				}
-
-				if (!Properties.Settings.Default.SaveCache)
-					Directory.Delete(Path.GetFullPath(XKCDComic.CacheFolder));
 			}
-			catch (Exception e) when (e is IOException)
+			catch (IOException e)
 			{
+				Message.Show($"Error accessing configuration file:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 
+			try
+			{
+				if (!Properties.Settings.Default.SaveCache)
+					ComicManager.ClearCache();
+			}
+			catch (IOException e)
+			{
+				Message.Show($"Error deleting cache:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
@@ -341,7 +353,8 @@ namespace XKCDReader
 		{
 			var config = new ConfigurationView
 			{
-				Owner = param as Window
+				Owner = param as Window,
+				DataContext = new ConfigurationViewModel(Message, ComicManager)
 			};
 			config.ShowDialog();
 		}

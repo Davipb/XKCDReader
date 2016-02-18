@@ -8,6 +8,9 @@ namespace XKCDReader
 {
 	public class ConfigurationViewModel : INotifyPropertyChanged
 	{
+		public IMessageService Message { get; }
+		public IComicService ComicManager { get; }
+
 		bool loadCurrent;
 		public bool LoadCurrent
 		{
@@ -41,8 +44,11 @@ namespace XKCDReader
 		public RelayCommand ResetCommand { get; }
 		public AsyncRelayCommand ClearCacheCommand { get; }
 
-		public ConfigurationViewModel()
+		public ConfigurationViewModel(IMessageService message, IComicService comicManager)
 		{
+			Message = message;
+			ComicManager = comicManager;
+
 			LoadFromProperties();
 
 			OkCommand = new RelayCommand(Ok, (o) => !Busy);
@@ -128,12 +134,12 @@ namespace XKCDReader
 
 			try
 			{
-				await Task.Run((Action)XKCDComic.ClearCache);
-				MessageBox.Show($"Cache successfully cleared.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+				await Task.Run((Action)ComicManager.ClearCache);
+				Message.Show($"Cache successfully cleared.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
 			catch (System.IO.IOException e)
 			{
-				MessageBox.Show($"Error deleting cache: {e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				Message.Show($"Error deleting cache: {e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 
 			Busy = false;

@@ -10,10 +10,6 @@
         FontFamily="Fonts/#Linux Libertine O" FontSize="18"
         x:Name="ConfigurationWindow" ResizeMode="NoResize" ShowInTaskbar="False">
 
-    <Window.DataContext>
-        <local:ConfigurationViewModel />
-    </Window.DataContext>
-
     <Window.Resources>
         <Style TargetType="CheckBox">
             <Setter Property="VerticalContentAlignment" Value="Center" />

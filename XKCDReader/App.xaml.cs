@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
 namespace XKCDReader
 {
@@ -13,5 +7,13 @@ namespace XKCDReader
 	/// </summary>
 	public partial class App : Application
 	{
+		void Application_Startup(object sender, StartupEventArgs args)
+		{
+			MainWindow = new MainWindow
+			{
+				DataContext = new MainWindowViewModel(new MessageService(), new ComicService())
+			};
+			MainWindow.Show();
+		}
 	}
 }
