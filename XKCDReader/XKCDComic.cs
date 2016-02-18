@@ -16,7 +16,7 @@ namespace XKCDReader
 		const string DownloadAddress = "http://xkcd.com/{0}/info.0.json";
 		const string CurrentComicAddress = "http://xkcd.com/info.0.json";
 
-		public int Number { get; protected set; }
+		public int Number { get; }
 
 		public string Title { get; protected set; }
 		public string HoverText { get; protected set; }
@@ -28,7 +28,10 @@ namespace XKCDReader
 		public string Month { get; protected set; }
 		public string Day { get; protected set; }
 
-		protected XKCDComic() { }
+		public XKCDComic(int number)
+		{
+			Number = number;
+		}
 
 		public static bool operator ==(XKCDComic a, XKCDComic b)
 		{
@@ -168,9 +171,8 @@ namespace XKCDReader
 		/// <returns>A Task, which when awaited returns the xkcd represented by the JSON Object <paramref name="obj"/></returns>
 		public static async Task<XKCDComic> FromJson(JObject obj)
 		{
-			var result = new XKCDComic
+			var result = new XKCDComic((int)obj["num"])
 			{
-				Number = (int)obj["num"],
 				Title = (string)obj["title"],
 				HoverText = (string)obj["alt"],
 				Transcript = (string)obj["transcript"],

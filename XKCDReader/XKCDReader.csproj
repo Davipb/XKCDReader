@@ -118,12 +118,13 @@
     </Compile>
     <Compile Include="AddComicViewModel.cs" />
     <Compile Include="AsyncRelayCommand.cs" />
-    <Compile Include="ComicService.cs" />
+    <Compile Include="Services\ComicService.cs" />
     <Compile Include="ConfigurationView.xaml.cs">
       <DependentUpon>ConfigurationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ConfigurationViewModel.cs" />
-    <Compile Include="MessageService.cs" />
+    <Compile Include="Services\PropertiesService.cs" />
+    <Compile Include="Services\InteractionService.cs" />
     <Compile Include="RelayCommand.cs" />
     <Page Include="AboutView.xaml">
       <SubType>Designer</SubType>

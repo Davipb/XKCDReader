@@ -3,13 +3,15 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
+using XKCDReader.Services;
 
 namespace XKCDReader
 {
 	public class ConfigurationViewModel : INotifyPropertyChanged
 	{
-		public IMessageService Message { get; }
+		public IInteractionService Interaction { get; }
 		public IComicService ComicManager { get; }
+		public IPropertiesService Properties { get; }
 
 		bool loadCurrent;
 		public bool LoadCurrent
@@ -44,10 +46,11 @@ namespace XKCDReader
 		public RelayCommand ResetCommand { get; }
 		public AsyncRelayCommand ClearCacheCommand { get; }
 
-		public ConfigurationViewModel(IMessageService message, IComicService comicManager)
+		public ConfigurationViewModel(IInteractionService message, IComicService comicManager, IPropertiesService properties)
 		{
-			Message = message;
+			Interaction = message;
 			ComicManager = comicManager;
+			Properties = properties;
 
 			LoadFromProperties();
 
@@ -72,9 +75,9 @@ namespace XKCDReader
 		/// </summary>
 		void LoadFromProperties()
 		{
-			LoadCurrent = Properties.Settings.Default.LoadCurrent;
-			SaveCache = Properties.Settings.Default.SaveCache;
-			PurgeComic = Properties.Settings.Default.PurgeComic;
+			LoadCurrent = Properties.LoadCurrent;
+			SaveCache = Properties.SaveCache;
+			PurgeComic = Properties.PurgeComic;
 		}
 
 		/// <summary>
@@ -82,10 +85,10 @@ namespace XKCDReader
 		/// </summary>
 		void SaveToProperties()
 		{
-			Properties.Settings.Default.LoadCurrent = LoadCurrent;
-			Properties.Settings.Default.SaveCache = SaveCache;
-			Properties.Settings.Default.PurgeComic = PurgeComic;
-			Properties.Settings.Default.Save();
+			Properties.LoadCurrent = LoadCurrent;
+			Properties.SaveCache = SaveCache;
+			Properties.PurgeComic = PurgeComic;
+			Properties.Save();
 		}
 
 		/// <summary>
@@ -93,7 +96,7 @@ namespace XKCDReader
 		/// </summary>
 		void Reset()
 		{
-			Properties.Settings.Default.Reset();
+			Properties.Reset();
 			LoadFromProperties();
 		}
 
@@ -135,11 +138,11 @@ namespace XKCDReader
 			try
 			{
 				await Task.Run((Action)ComicManager.ClearCache);
-				Message.Show($"Cache successfully cleared.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+				Interaction.ShowMessage($"Cache successfully cleared.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
 			catch (System.IO.IOException e)
 			{
-				Message.Show($"Error deleting cache: {e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				Interaction.ShowMessage($"Error deleting cache: {e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 
 			Busy = false;

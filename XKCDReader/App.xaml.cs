@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using XKCDReader.Services;
 
 namespace XKCDReader
 {
@@ -11,7 +12,7 @@ namespace XKCDReader
 		{
 			MainWindow = new MainWindow
 			{
-				DataContext = new MainWindowViewModel(new MessageService(), new ComicService())
+				DataContext = new MainWindowViewModel(new InteractionService(), new ComicService(), new PropertiesService())
 			};
 			MainWindow.Show();
 		}

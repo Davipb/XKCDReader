@@ -5,12 +5,13 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using XKCDReader.Services;
 
 namespace XKCDReader
 {
 	public class AddComicViewModel : INotifyPropertyChanged
 	{
-		public IMessageService Message { get; }
+		public IInteractionService Interaction { get; }
 		public IComicService ComicManager { get; }
 
 		int comicNumber;
@@ -40,9 +41,9 @@ namespace XKCDReader
 		public event PropertyChangedEventHandler PropertyChanged;
 
 
-		public AddComicViewModel(IMessageService message, IComicService comicManager)
+		public AddComicViewModel(IInteractionService message, IComicService comicManager)
 		{
-			Message = message;
+			Interaction = message;
 			ComicManager = comicManager;
 
 			DownloadCommand = new AsyncRelayCommand(Download, (o) => !Downloading && ComicValid(ComicNumber));
@@ -72,8 +73,8 @@ namespace XKCDReader
 		{
 			var window = param as Window;
 
-			var previousCursor = Mouse.OverrideCursor;
-			Mouse.OverrideCursor = Cursors.Wait;
+			var previousCursor = Interaction.MouseOverride;
+			Interaction.MouseOverride = Cursors.Wait;
 
 			Downloading = true;
 
@@ -84,13 +85,13 @@ namespace XKCDReader
 			}
 			catch (Exception e) when (e is WebException || e is Newtonsoft.Json.JsonException)
 			{
-				Message.Show($"Error downloading comic info:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				Interaction.ShowMessage($"Error downloading comic info:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 				window.DialogResult = false;
 			}
 
 			Downloading = false;
 
-			Mouse.OverrideCursor = previousCursor;
+			Interaction.MouseOverride = previousCursor;
 			window.Close();
 		}
 	}

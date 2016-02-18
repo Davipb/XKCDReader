@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using XKCDReader.Services;
 
 namespace XKCDReader
 {
@@ -15,8 +16,10 @@ namespace XKCDReader
 		const string ConfigurationFile = "config";
 
 		public ObservableCollection<XKCDComic> Comics { get; } = new ObservableCollection<XKCDComic>();
-		public IMessageService Message { get; }
+
+		public IInteractionService Interaction { get; }
 		public IComicService ComicManager { get; }
+		public IPropertiesService Properties { get; }
 
 		XKCDComic selectedComic = null;
 		public XKCDComic SelectedComic
@@ -52,10 +55,11 @@ namespace XKCDReader
 
 		int currentComicNumber = 0;
 
-		public MainWindowViewModel(IMessageService message, IComicService comicManager)
+		public MainWindowViewModel(IInteractionService message, IComicService comicManager, IPropertiesService properties)
 		{
-			Message = message;
+			Interaction = message;
 			ComicManager = comicManager;
+			Properties = properties;
 
 			AddComicCommand = new RelayCommand(AddComic, (o) => !Downloading);
 			AddRandomComicCommand = new AsyncRelayCommand(AddRandomComic);
@@ -115,21 +119,18 @@ namespace XKCDReader
 		/// <param name="param">Command parameter, expected to be the current Window</param>
 		void AddComic(object param)
 		{
-			var context = new AddComicViewModel(Message, ComicManager)
+			var context = new AddComicViewModel(Interaction, ComicManager)
 			{
 				ComicNumber = SelectedComic?.Number ?? 1,
 				ComicValid = (i) => i > 0 && !Comics.Any(x => x.Number == i)
 			};
-			var window = new AddComicView
-			{
-				DataContext = context,
-				Owner = param as Window
-			};
 
-			if ((window.ShowDialog() ?? false) && context.Result != null)
+			var result = ComicManager.GetFromUser(context, param as Window);
+
+			if (result != null)
 			{
-				Comics.Add(context.Result);
-				SelectedComic = context.Result;
+				Comics.Add(result);
+				SelectedComic = result;
 			}
 		}
 
@@ -157,8 +158,8 @@ namespace XKCDReader
 		/// </remarks>
 		async Task AddRandomComic(object param)
 		{
-			var previous = Mouse.OverrideCursor;
-			Mouse.OverrideCursor = Cursors.Wait;
+			var previous = Interaction.MouseOverride;
+			Interaction.MouseOverride = Cursors.Wait;
 			Downloading = true;
 
 			int type;
@@ -174,6 +175,10 @@ namespace XKCDReader
 				// User wants a random comic that they don't have downloaded to their list yet
 				// Generate all possible comic numbers, subtract those already in the list, order them randomly then take the first one.
 				// Heavy, but better than looping infinitely until we generate a valid number
+
+				// If the list is full, this is impossible
+				if (Comics.Count == currentComicNumber)
+					return;
 
 				random = await Task.Run(() =>
 				Enumerable.Range(1, currentComicNumber)
@@ -212,7 +217,7 @@ namespace XKCDReader
 
 			SelectedComic = comic;
 
-			Mouse.OverrideCursor = previous;
+			Interaction.MouseOverride = previous;
 			Downloading = false;
 		}
 
@@ -231,7 +236,7 @@ namespace XKCDReader
 
 			if (Comics.Contains(current))
 			{
-				Message.Show($"Current comic (number {current.Number}) already loaded", "Already loaded", MessageBoxButton.OK, MessageBoxImage.Information);
+				Interaction.ShowMessage($"Current comic (number {current.Number}) already loaded", "Already loaded", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
 			else
 			{
@@ -253,7 +258,7 @@ namespace XKCDReader
 
 			Comics.Remove(comic);
 
-			if (Properties.Settings.Default.PurgeComic)
+			if (Properties.PurgeComic)
 				comic.DeleteCache();
 		}
 
@@ -269,34 +274,31 @@ namespace XKCDReader
 				var currentComic = await ComicManager.GetCurrent();
 				currentComicNumber = currentComic.Number;
 
-				if (Properties.Settings.Default.LoadCurrent)
+				if (Properties.LoadCurrent)
 					Comics.Add(currentComic);
 			}
 			catch (Exception e) when (e is System.Net.WebException || e is IOException)
 			{
-				Message.Show($"Unable to load current comic:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				Interaction.ShowMessage($"Unable to load current comic:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 
-			if (File.Exists(ConfigurationFile))
+			var allComics = Properties.ReadConfigurationFile(ConfigurationFile);
+
+			foreach (var comic in allComics)
 			{
-				var allComics = File.ReadAllLines(ConfigurationFile).Select(x => int.Parse(x));
-
-				foreach (var comic in allComics)
+				try
 				{
-					try
-					{
-						var loaded = await ComicManager.GetWithNumber(comic);
-						if (loaded != null && !Comics.Contains(loaded))
-							Comics.Add(loaded);
-					}
-					catch (Exception e) when (e is IOException || e is System.Net.WebException)
-					{
-						Message.Show($"Unable to load comic number {comic}:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-					}
+					var loaded = await ComicManager.GetWithNumber(comic);
+					if (loaded != null && !Comics.Contains(loaded))
+						Comics.Add(loaded);
 				}
-
-				SelectedComic = Comics.FirstOrDefault();
+				catch (Exception e) when (e is IOException || e is System.Net.WebException)
+				{
+					Interaction.ShowMessage($"Unable to load comic number {comic}:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				}
 			}
+
+			SelectedComic = Comics.FirstOrDefault();
 		}
 
 		/// <summary>
@@ -308,27 +310,21 @@ namespace XKCDReader
 		{
 			try
 			{
-				using (var writer = new StreamWriter(File.Open(ConfigurationFile, FileMode.Create)))
-				{
-					foreach (var comic in Comics)
-					{
-						await writer.WriteLineAsync(comic.Number.ToString());
-					}
-				}
+				await Properties.SaveConfigurationFile(ConfigurationFile, Comics.Select(x => x.Number));
 			}
 			catch (IOException e)
 			{
-				Message.Show($"Error accessing configuration file:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				Interaction.ShowMessage($"Error accessing configuration file:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 
 			try
 			{
-				if (!Properties.Settings.Default.SaveCache)
+				if (!Properties.SaveCache)
 					ComicManager.ClearCache();
 			}
 			catch (IOException e)
 			{
-				Message.Show($"Error deleting cache:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				Interaction.ShowMessage($"Error deleting cache:\n{e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
@@ -354,7 +350,7 @@ namespace XKCDReader
 			var config = new ConfigurationView
 			{
 				Owner = param as Window,
-				DataContext = new ConfigurationViewModel(Message, ComicManager)
+				DataContext = new ConfigurationViewModel(Interaction, ComicManager, Properties)
 			};
 			config.ShowDialog();
 		}
