@@ -2,7 +2,7 @@
 using System.Windows.Input;
 using XKCDReader.Services;
 
-namespace XKCDReader.Tests
+namespace XKCDReader.Tests.Services
 {
 	public class MockMessageService : IInteractionService
 	{

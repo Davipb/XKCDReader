@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
+using XKCDReader.Tests.Services;
 
 namespace XKCDReader.Tests
 {
@@ -8,7 +9,7 @@ namespace XKCDReader.Tests
 	public class MainWindowTests
 	{
 		#region AddComic
-		[TestCategory("AddComic")]
+		[TestCategory("MainWindowTests.AddComic")]
 		[TestMethod]
 		public void AddComic_Normal_AddsComic()
 		{
@@ -21,7 +22,7 @@ namespace XKCDReader.Tests
 			Assert.IsTrue(viewModel.Comics.Contains(result));
 		}
 
-		[TestCategory("AddComic")]
+		[TestCategory("MainWindowTests.AddComic")]
 		[TestMethod]
 		public void AddComic_Normal_SelectsAddedComic()
 		{
@@ -34,7 +35,7 @@ namespace XKCDReader.Tests
 		}
 
 
-		[TestCategory("AddComic")]
+		[TestCategory("MainWindowTests.AddComic")]
 		[TestMethod]
 		public void AddComic_UserCancels_DoesntAddComic()
 		{
@@ -45,7 +46,7 @@ namespace XKCDReader.Tests
 		}
 		#endregion
 
-		[TestCategory("AddCurrentComic")]
+		[TestCategory("MainWindowTests.AddCurrentComic")]
 		[TestMethod]
 		public void AddCurrentComic_Normal_AddsComic()
 		{
@@ -60,7 +61,7 @@ namespace XKCDReader.Tests
 		}
 
 		#region AddRandomComic
-		[TestCategory("AddRandomComic")]
+		[TestCategory("MainWindowTests.AddRandomComic")]
 		[TestMethod]
 		public void AddRandomComic_Type0WhenEmpty_AddsComic()
 		{
@@ -78,7 +79,7 @@ namespace XKCDReader.Tests
 			Assert.IsTrue(comicNumber <= current.Number);
 		}
 
-		[TestCategory("AddRandomComic")]
+		[TestCategory("MainWindowTests.AddRandomComic")]
 		[TestMethod]
 		public void AddRandomComic_Type0WhenFull_SelectsComic()
 		{
@@ -102,7 +103,7 @@ namespace XKCDReader.Tests
 			Assert.IsTrue(allComics.Contains(viewModel.SelectedComic));
 		}
 
-		[TestCategory("AddRandomComic")]
+		[TestCategory("MainWindowTests.AddRandomComic")]
 		[TestMethod]
 		public void AddRandomComic_Type1WhenEmpty_AddsComic()
 		{
@@ -121,7 +122,7 @@ namespace XKCDReader.Tests
 			Assert.IsTrue(comicNumber <= current.Number);
 		}
 
-		[TestCategory("AddRandomComic")]
+		[TestCategory("MainWindowTests.AddRandomComic")]
 		[TestMethod]
 		public void AddRandomComic_Type1WhenPartiallyFull_AddsComic()
 		{
@@ -146,7 +147,7 @@ namespace XKCDReader.Tests
 			Assert.IsFalse(allComics.Contains(viewModel.SelectedComic));
 		}
 
-		[TestCategory("AddRandomComic")]
+		[TestCategory("MainWindowTests.AddRandomComic")]
 		[TestMethod]
 		public void AddRandomComic_Type1WhenFull_DoesNothing()
 		{
@@ -167,7 +168,7 @@ namespace XKCDReader.Tests
 			Assert.IsNull(viewModel.SelectedComic);
 		}
 
-		[TestCategory("AddRandomComic")]
+		[TestCategory("MainWindowTests.AddRandomComic")]
 		[TestMethod]
 		public void AddRandomComic_Type2WhenEmpty_DoesNothing()
 		{
@@ -181,7 +182,7 @@ namespace XKCDReader.Tests
 			Assert.IsNull(viewModel.SelectedComic);
 		}
 
-		[TestCategory("AddRandomComic")]
+		[TestCategory("MainWindowTests.AddRandomComic")]
 		[TestMethod]
 		public void AddRandomComic_Type2WhenPartiallyFull_SelectsComic()
 		{
@@ -206,7 +207,7 @@ namespace XKCDReader.Tests
 			Assert.IsTrue(allComics.Contains(viewModel.SelectedComic));
 		}
 
-		[TestCategory("AddRandomComic")]
+		[TestCategory("MainWindowTests.AddRandomComic")]
 		[TestMethod]
 		public void AddRandomComic_Type2WhenFull_SelectsComic()
 		{
@@ -231,7 +232,7 @@ namespace XKCDReader.Tests
 		}
 		#endregion
 
-		[TestCategory("RemoveComic")]
+		[TestCategory("MainWindowTests.RemoveComic")]
 		[TestMethod]
 		public void RemoveComic_Normal_RemovesComic()
 		{
@@ -243,7 +244,7 @@ namespace XKCDReader.Tests
 		}
 
 		#region Loaded
-		[TestCategory("Loaded")]
+		[TestCategory("MainWindowTests.Loaded")]
 		[TestMethod]
 		public void Loaded_WhenNoConfiguration_DoesNothing()
 		{
@@ -254,7 +255,7 @@ namespace XKCDReader.Tests
 			Assert.IsNull(viewModel.SelectedComic);
 		}
 
-		[TestCategory("Loaded")]
+		[TestCategory("MainWindowTests.Loaded")]
 		[TestMethod]
 		public void Loaded_WhenConfigurationPresent_LoadsConfiguration()
 		{
@@ -271,7 +272,7 @@ namespace XKCDReader.Tests
 			Assert.IsTrue(viewModel.Comics.Select(x => x.Number).OrderBy(x => x).SequenceEqual(config));
 		}
 
-		[TestCategory("Loaded")]
+		[TestCategory("MainWindowTests.Loaded")]
 		[TestMethod]
 		public void Loaded_WhenLoadCurrentIsTrue_LoadsCurrent()
 		{
@@ -290,7 +291,7 @@ namespace XKCDReader.Tests
 		#endregion
 
 		#region Closed
-		[TestCategory("Closed")]
+		[TestCategory("MainWindowTests.Closed")]
 		[TestMethod]
 		public void Closed_WhenSaveCacheIsFalse_DeletesCache()
 		{
@@ -304,7 +305,7 @@ namespace XKCDReader.Tests
 			Assert.IsTrue(called);
 		}
 
-		[TestCategory("Closed")]
+		[TestCategory("MainWindowTests.Closed")]
 		[TestMethod]
 		public void Closed_Normal_SavesConfigurationFile()
 		{

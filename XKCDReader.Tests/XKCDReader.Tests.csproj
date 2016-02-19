@@ -91,9 +91,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="MainWindowTests.cs" />
-    <Compile Include="MockComicService.cs" />
-    <Compile Include="MockMessageService.cs" />
-    <Compile Include="MockPropertiesService.cs" />
+    <Compile Include="Services\MockComicService.cs" />
+    <Compile Include="Services\MockMessageService.cs" />
+    <Compile Include="Services\MockPropertiesService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
