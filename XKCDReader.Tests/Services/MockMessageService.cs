@@ -4,9 +4,11 @@ using XKCDReader.Services;
 
 namespace XKCDReader.Tests.Services
 {
-	public class MockMessageService : IInteractionService
+	public class MockInteractionService : IInteractionService
 	{
 		public Cursor MouseOverride { get; set; } = Cursors.Arrow;
+		public string ClipboardText { get; private set; }
+		public string LastStartedProcess { get; private set; }
 
 		public MessageBoxResult ShowMessage(string text, string caption, MessageBoxButton button, MessageBoxImage icon)
 		{
@@ -19,5 +21,11 @@ namespace XKCDReader.Tests.Services
 					return MessageBoxResult.Yes;
 			}
 		}
+
+		public void SetClipboardText(string text)
+			=> ClipboardText = text;
+
+		public void StartProcess(string uri)
+			=> LastStartedProcess = uri;
 	}
 }

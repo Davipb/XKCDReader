@@ -74,7 +74,7 @@ namespace XKCDReader
 			ConfigurationCommand = new RelayCommand(Configuration);
 
 			CopyLinkCommand = new RelayCommand(
-				(o) => Clipboard.SetText(string.Format(o as string, SelectedComic.Number)),
+				(o) => Interaction.SetClipboardText(string.Format(o as string, SelectedComic.Number)),
 				(o) => SelectedComic != null && o is string);
 
 			DeleteCacheCommand = new RelayCommand(
@@ -82,7 +82,7 @@ namespace XKCDReader
 				() => SelectedComic != null);
 
 			OpenLinkCommand = new RelayCommand(
-				(o) => System.Diagnostics.Process.Start(string.Format(o as string, SelectedComic.Number)),
+				(o) => Interaction.StartProcess(string.Format(o as string, SelectedComic.Number)),
 				(o) => SelectedComic != null && o is string);
 
 			PropertyChanged += (o, e) =>

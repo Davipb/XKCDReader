@@ -15,7 +15,7 @@ namespace XKCDReader.Tests
 		{
 			var result = new XKCDComic(500);
 
-			var viewModel = new MainWindowViewModel(new MockMessageService(), new MockComicService(result), new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), new MockComicService(result), new MockPropertiesService());
 			viewModel.AddComicCommand.Execute(null);
 
 			Assert.AreEqual(viewModel.Comics.Count, 1);
@@ -28,7 +28,7 @@ namespace XKCDReader.Tests
 		{
 			var result = new XKCDComic(500);
 
-			var viewModel = new MainWindowViewModel(new MockMessageService(), new MockComicService(result), new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), new MockComicService(result), new MockPropertiesService());
 			viewModel.AddComicCommand.Execute(null);
 
 			Assert.AreEqual(viewModel.SelectedComic, result);
@@ -39,7 +39,7 @@ namespace XKCDReader.Tests
 		[TestMethod]
 		public void AddComic_UserCancels_DoesntAddComic()
 		{
-			var viewModel = new MainWindowViewModel(new MockMessageService(), new MockComicService(null), new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), new MockComicService(null), new MockPropertiesService());
 			viewModel.AddComicCommand.Execute(null);
 
 			Assert.IsFalse(viewModel.Comics.Count > 0);
@@ -52,7 +52,7 @@ namespace XKCDReader.Tests
 		{
 			var current = new XKCDComic(500);
 
-			var viewModel = new MainWindowViewModel(new MockMessageService(), new MockComicService(current), new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), new MockComicService(current), new MockPropertiesService());
 			viewModel.LoadedCommand.ExecuteAsync(null).Wait();
 			viewModel.AddCurrentComicCommand.ExecuteAsync(null).Wait();
 
@@ -67,7 +67,7 @@ namespace XKCDReader.Tests
 		{
 			var current = new XKCDComic(500);
 
-			var viewModel = new MainWindowViewModel(new MockMessageService(), new MockComicService(current), new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), new MockComicService(current), new MockPropertiesService());
 			viewModel.LoadedCommand.ExecuteAsync(null).Wait();
 			viewModel.AddRandomComicCommand.ExecuteAsync("0").Wait();
 
@@ -87,7 +87,7 @@ namespace XKCDReader.Tests
 			var allComics = new List<XKCDComic>();
 
 			var comicService = new MockComicService(new XKCDComic(totalComics));
-			var viewModel = new MainWindowViewModel(new MockMessageService(), comicService, new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), comicService, new MockPropertiesService());
 			viewModel.LoadedCommand.ExecuteAsync(null).Wait();
 
 			for (int i = 1; i <= totalComics; i++)
@@ -110,7 +110,7 @@ namespace XKCDReader.Tests
 			var current = new XKCDComic(10);
 			var comicService = new MockComicService(current);
 
-			var viewModel = new MainWindowViewModel(new MockMessageService(), comicService, new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), comicService, new MockPropertiesService());
 			viewModel.LoadedCommand.ExecuteAsync(null).Wait();
 			viewModel.AddRandomComicCommand.ExecuteAsync("1").Wait();
 
@@ -131,7 +131,7 @@ namespace XKCDReader.Tests
 			var allComics = new List<XKCDComic>();
 
 			var comicService = new MockComicService(new XKCDComic(totalComics));
-			var viewModel = new MainWindowViewModel(new MockMessageService(), comicService, new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), comicService, new MockPropertiesService());
 			viewModel.LoadedCommand.ExecuteAsync(null).Wait();
 
 			for (int i = 1; i <= filledComics; i++)
@@ -154,7 +154,7 @@ namespace XKCDReader.Tests
 			int totalComics = 10;
 
 			var comicService = new MockComicService(new XKCDComic(totalComics));
-			var viewModel = new MainWindowViewModel(new MockMessageService(), comicService, new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), comicService, new MockPropertiesService());
 			viewModel.LoadedCommand.ExecuteAsync(null).Wait();
 
 			for (int i = 1; i <= totalComics; i++)
@@ -174,7 +174,7 @@ namespace XKCDReader.Tests
 		{
 			var current = new XKCDComic(10);
 
-			var viewModel = new MainWindowViewModel(new MockMessageService(), new MockComicService(current), new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), new MockComicService(current), new MockPropertiesService());
 			viewModel.LoadedCommand.ExecuteAsync(null).Wait();
 			viewModel.AddRandomComicCommand.ExecuteAsync("2").Wait();
 
@@ -191,7 +191,7 @@ namespace XKCDReader.Tests
 			var allComics = new List<XKCDComic>();
 
 			var comicService = new MockComicService(new XKCDComic(totalComics));
-			var viewModel = new MainWindowViewModel(new MockMessageService(), comicService, new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), comicService, new MockPropertiesService());
 			viewModel.LoadedCommand.ExecuteAsync(null).Wait();
 
 			for (int i = 1; i <= filledComics; i++)
@@ -215,7 +215,7 @@ namespace XKCDReader.Tests
 			var allComics = new List<XKCDComic>();
 
 			var comicService = new MockComicService(new XKCDComic(totalComics));
-			var viewModel = new MainWindowViewModel(new MockMessageService(), comicService, new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), comicService, new MockPropertiesService());
 			viewModel.LoadedCommand.ExecuteAsync(null).Wait();
 
 			for (int i = 1; i <= totalComics; i++)
@@ -236,11 +236,61 @@ namespace XKCDReader.Tests
 		[TestMethod]
 		public void RemoveComic_Normal_RemovesComic()
 		{
-			var viewModel = new MainWindowViewModel(new MockMessageService(), new MockComicService(new XKCDComic(500)), new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), new MockComicService(new XKCDComic(500)), new MockPropertiesService());
 			viewModel.AddComicCommand.Execute(null);
 			viewModel.RemoveComicCommand.Execute(null);
 
 			Assert.AreEqual(viewModel.Comics.Count, 0);
+		}
+
+		[TestCategory("MainWindowTests.ClearComics")]
+		[TestMethod]
+		public void ClearComic_Normal_ClearsComics()
+		{
+			int comicsToAdd = 10;
+
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), new MockComicService(new XKCDComic(comicsToAdd)), new MockPropertiesService());
+
+			for (int i = 1; i <= comicsToAdd; i++)
+				viewModel.Comics.Add(new XKCDComic(i));
+
+			viewModel.ClearComicsCommand.Execute(null);
+
+			Assert.AreEqual(viewModel.Comics.Count, 0);
+		}
+
+		[TestCategory("MainWindowTests.CopyLink")]
+		[TestMethod]
+		public void CopyLink_Normal_CopiesLink()
+		{
+			var linkTemplate = "http://www.xkcd.com/{0}/";
+			var comic = new XKCDComic(500);
+			var interationService = new MockInteractionService();
+
+			var viewModel = new MainWindowViewModel(interationService, new MockComicService(comic), new MockPropertiesService());
+			viewModel.Comics.Add(comic);
+			viewModel.SelectedComic = comic;
+
+			viewModel.CopyLinkCommand.Execute(linkTemplate);
+
+			Assert.AreEqual(interationService.ClipboardText, string.Format(linkTemplate, comic.Number));
+		}
+
+		[TestCategory("MainWindowTests.OpenLink")]
+		[TestMethod]
+		public void OpenLink_Normal_OpensLink()
+		{
+			var linkTemplate = "http://www.xkcd.com/{0}/";
+			var comic = new XKCDComic(500);
+			var interationService = new MockInteractionService();
+
+			var viewModel = new MainWindowViewModel(interationService, new MockComicService(comic), new MockPropertiesService());
+			viewModel.Comics.Add(comic);
+			viewModel.SelectedComic = comic;
+
+			viewModel.OpenLinkCommand.Execute(linkTemplate);
+
+			Assert.AreEqual(interationService.LastStartedProcess, string.Format(linkTemplate, comic.Number));
 		}
 
 		#region Loaded
@@ -248,7 +298,7 @@ namespace XKCDReader.Tests
 		[TestMethod]
 		public void Loaded_WhenNoConfiguration_DoesNothing()
 		{
-			var viewModel = new MainWindowViewModel(new MockMessageService(), new MockComicService(new XKCDComic(500)), new MockPropertiesService());
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), new MockComicService(new XKCDComic(500)), new MockPropertiesService());
 			viewModel.LoadedCommand.ExecuteAsync(null).Wait();
 
 			Assert.AreEqual(viewModel.Comics.Count, 0);
@@ -265,7 +315,7 @@ namespace XKCDReader.Tests
 				ConfigurationFile = config
 			};
 
-			var viewModel = new MainWindowViewModel(new MockMessageService(), new MockComicService(new XKCDComic(500)), properties);
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), new MockComicService(new XKCDComic(500)), properties);
 			viewModel.LoadedCommand.ExecuteAsync(null).Wait();
 
 			Assert.AreEqual(viewModel.Comics.Count, config.Length);
@@ -282,7 +332,7 @@ namespace XKCDReader.Tests
 				LoadCurrent = true
 			};
 
-			var viewModel = new MainWindowViewModel(new MockMessageService(), new MockComicService(current), properties);
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), new MockComicService(current), properties);
 			viewModel.LoadedCommand.ExecuteAsync(null).Wait();
 
 			Assert.AreEqual(viewModel.Comics.Count, 1);
@@ -299,7 +349,7 @@ namespace XKCDReader.Tests
 			var comicService = new MockComicService(null);
 			comicService.ClearCacheCalled += () => called = true;
 
-			var viewModel = new MainWindowViewModel(new MockMessageService(), comicService, new MockPropertiesService { SaveCache = false });
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), comicService, new MockPropertiesService { SaveCache = false });
 			viewModel.ClosedCommand.ExecuteAsync(null).Wait();
 
 			Assert.IsTrue(called);
@@ -317,7 +367,7 @@ namespace XKCDReader.Tests
 
 			var properties = new MockPropertiesService();
 
-			var viewModel = new MainWindowViewModel(new MockMessageService(), new MockComicService(null), properties);
+			var viewModel = new MainWindowViewModel(new MockInteractionService(), new MockComicService(null), properties);
 
 			foreach (var comic in allComics) viewModel.Comics.Add(comic);
 
